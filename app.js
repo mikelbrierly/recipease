@@ -6,7 +6,7 @@ const port = 8080;
 const server = http.createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
-  res.end('Holla from the dev env\n');
+  res.end('Holla from the prod env!\n');
 });
 
 server.listen(port, hostname, () => {
