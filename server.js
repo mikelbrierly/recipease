@@ -1,4 +1,11 @@
 const http = require('http');
+const mongoose = require('mongoose');
+const ingredient = require('./api/models/ingredientModel');
+
+mongoose.connect('mongodb://localhost:27017/recipeasedb', { // port is neccesary when using useNewUrlParser option
+  useNewUrlParser: true, // https://arunrajeevan.medium.com/understanding-mongoose-connection-options-2b6e73d96de1
+  useUnifiedTopology: true // https://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/
+});
 
 const router = require('./api/router');
 

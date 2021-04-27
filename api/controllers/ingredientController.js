@@ -1,34 +1,41 @@
+const mongoose = require('mongoose');
+const ingredient = mongoose.model('Ingredient');
+
 //this is like the equivalent of /ingredient/:id
 const id = url => url.match(/^\/ingredients(.*)/)[1];
 
-// plural/singular for methods?
+// =========== jank-ass body-parser ============
+const retrieveBody = (request) => {
+  return new Promise((resolve, reject) => {
+
+    let body = '';
+    request.on('data', buffer => {
+      body += buffer.toString();
+    });
+    request.on('end', () => {
+      if(!body) return reject("ERROR: missing required parameters");
+      resolve(JSON.parse(body));
+    });
+  });
+};
+// ======== end of jank-ass body parser =========
+
+
 const actions = {
 
   createIngredients: (req, cb) => {
 
-    if(id(req.url) !== '/create') {
-      // throw error since it needs to maintain function signature integrity
+    if(id(req.url) !== '/create') return cb("ERROR: hit /ingredients/create to add item to maintain function signature integrity");
 
-      //interesting. actually throwing an error (throw new Error) kills the server, it doesn't actually send a response. So I should send an http response code instead
-      return cb("ERROR: hit /ingredients/create to add item to maintain function signature integrity");
-      // probably build separate function for just handling the errors
-    } 
-    
-    // =========== This is basically just a jank-ass body-parser ============
-    //and it comes baked into Express
-    let body = '';
-    req.on('data', buffer => {
-      body += buffer.toString();
-    });
-    req.on('end', () => {
-      if(!body) return cb("ERROR: missing required parameters");
-      req.body = JSON.parse(body);
-
-      //take req.body and update single entry in DB
-      cb(`successfully added ${JSON.stringify(req.body)}`);
-    });
-    // ======================================================================
-
+    retrieveBody(req)
+      .then(resp => {
+        req.body = resp;
+        //take request.body and update single entry in DB
+        cb(`successfully added ${JSON.stringify(req.body)}`);
+      })
+      .catch(err => {
+        cb(err);
+      });
   },
 
   getIngredients: (req, cb) => {

@@ -12,4 +12,4 @@ const IngredientSchema = new Schema({
   units: [String]
 });
 
-moodule.exports = mongoose.model('Ingredient', IngredientSchema);
+module.exports = mongoose.model('Ingredient', IngredientSchema);
