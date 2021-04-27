@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
-const ingredient = mongoose.model('Ingredient');
+const Ingredient = mongoose.model('Ingredient');
 
 //this is like the equivalent of /ingredient/:id
 const id = url => url.match(/^\/ingredients(.*)/)[1];
 
 // =========== jank-ass body-parser ============
-const retrieveBody = (request) => {
+const parseBody = (request) => {
   return new Promise((resolve, reject) => {
 
     let body = '';
@@ -27,11 +27,14 @@ const actions = {
 
     if(id(req.url) !== '/create') return cb("ERROR: hit /ingredients/create to add item to maintain function signature integrity");
 
-    retrieveBody(req)
+    parseBody(req)
       .then(resp => {
         req.body = resp;
-        //take request.body and update single entry in DB
-        cb(`successfully added ${JSON.stringify(req.body)}`);
+        const newIngredient = new Ingredient(req.body);
+        newIngredient.save((err, ingredient) => {
+          if(err) return cb(err.message || err);
+          return cb(`successfully added ${ingredient}`);
+        })
       })
       .catch(err => {
         cb(err);
@@ -41,13 +44,14 @@ const actions = {
   getIngredients: (req, cb) => {
     if(id(req.url)) {
       cb("here is one single ingredient")
-      //get single ingredient from DB
-      //return early
       return;
     }
 
-    //return all ingredients from DB (paginated)
-    cb("here are all of the ingredients (paginated)");
+    // TODO: paginate responses
+    Ingredient.find({}, function(err, ingredient) {
+      if(err) return cb(err.message || err);
+      return cb(ingredient);
+    })
   },
 
   updateIngredients: (req, cb) => {

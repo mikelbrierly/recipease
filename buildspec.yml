@@ -1,3 +1,6 @@
+# get this error when running eb deploy -
+# WARNING: Beanstalk configuration header 'eb_codebuild_settings' is missing from Buildspec file; will not use Beanstalk Code Build integration
+
 version: 0.1
 
 phases:
