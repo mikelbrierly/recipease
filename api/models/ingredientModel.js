@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+
+const { Schema } = mongoose;
 
 const IngredientSchema = new Schema({
   name: String,
@@ -8,7 +9,7 @@ const IngredientSchema = new Schema({
   image_url: String,
   category: String,
   shelf_life: Number,
-  units: [String]
+  units: [String],
 });
 
 module.exports = mongoose.model('Ingredient', IngredientSchema);
