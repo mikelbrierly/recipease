@@ -1,10 +1,10 @@
-const ingredientRoute = require('./routes/ingredientRoutes');
-const recipeRoute = require('./routes/recipeRoutes');
-const mealplanRoute = require('./routes/mealplanRoutes');
+const ingredientRoutes = require('./routes/ingredientRoutes');
+const recipeRoutes = require('./routes/recipeRoutes');
+const mealplanRoutes = require('./routes/mealplanRoutes');
 
 module.exports = (req, cb) => {
   //specific for create? Rather than just ingredient* ?
-  if(req.url.match(/^\/ingredients(.*)/)) ingredientRoute(req, cb);
-  if(req.url.match(/^\/recipes(.*)/)) recipeRoute(req, cb);
-  if(req.url.match(/^\/mealplans(.*)/)) mealplanRoute(req, cb);
+  if(req.url.match(/^\/ingredients(.*)/)) ingredientRoutes(req, cb);
+  if(req.url.match(/^\/recipes(.*)/)) recipeRoutes(req, cb);
+  if(req.url.match(/^\/mealplans(.*)/)) mealplanRoutes(req, cb);
 };
