@@ -2,13 +2,17 @@
   "name": "recipease",
   "version": "0.0.1",
   "description": "A web app for meal planning and grocery shopping lists",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "export NODE_ENV=dev && nodemon server.js",
+    "devPm2": "export NODE_ENV=dev && ./node_modules/pm2/bin/pm2-runtime server.js",
+    "prod": "export NODE_ENV=prod && ./node_modules/pm2/bin/pm2-runtime server.js",
+    "debug": "node debug server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint api"
   },
-  "engines" : { 
-    "node" : "14.13.0"
+  "engines": {
+    "node": "14.13.0"
   },
   "repository": {
     "type": "git",
@@ -19,5 +23,27 @@
   "bugs": {
     "url": "https://github.com/mikelbrierly/recipease/issues"
   },
-  "homepage": "https://github.com/mikelbrierly/recipease#readme"
+  "homepage": "https://github.com/mikelbrierly/recipease#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.13.16",
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "nodemon": "^2.0.7",
+    "prettier": "^2.2.1"
+  },
+  "dependencies": {
+    "config": "^3.3.6",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.5",
+    "pm2": "^4.5.6"
+  }
 }
