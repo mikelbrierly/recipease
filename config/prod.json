@@ -1,0 +1,6 @@
+{
+  "database": {
+    "host": "prodDbUrl",
+    "port": 8080
+  }
+}

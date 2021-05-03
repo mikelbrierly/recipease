@@ -1,23 +1,42 @@
 const http = require('http');
 const mongoose = require('mongoose');
-const config = require('./config');
+const config = require('config');
+const tmpLocalConfig = require('./config');
 require('./api/models/ingredientModel');
 
-mongoose.connect('mongodb+srv://recipease0.5timp.mongodb.net/recipease', {
+// ******** DB *********
+// break out db initialization to separate file
+const dbHost = config.has('database.host') ? config.get('database.host') : '';
+const dbPort = config.has('database.port') ? config.get('database.port') : '';
+const dbConnectionString = dbPort ? `${dbHost}:${dbPort}` : dbHost;
+
+if (!dbHost) {
+  console.error('database configuration settings not set');
+}
+
+mongoose.connect(dbConnectionString, {
   useNewUrlParser: true, // https://arunrajeevan.medium.com/understanding-mongoose-connection-options-2b6e73d96de1
   useUnifiedTopology: true, // https://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/
-  user: config.mongodb.username,
-  pass: config.mongodb.password,
+  // TODO: change this to an s3 bucket or something storing credentials securely
+  user: tmpLocalConfig.mongodb.username,
+  pass: tmpLocalConfig.mongodb.password,
 });
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
-  console.log('\n ~~ 🥳 successfully connected to db 🎉 ~~ \n');
+  console.log(
+    `\n ~~ 🥳 successfully connected to db ${dbConnectionString} 🎉 ~~ \n`
+  );
 });
 
-const router = require('./api/router');
+// ******** END DB *********
 
+// ******** ROUTING *********
+const router = require('./api/router');
+// ****** END ROUTING *******
+
+// ******** SERVER/ROUTER INITIALIZATION *********
 const hostname = 'localhost';
 const port = 8080;
 
@@ -31,5 +50,8 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, hostname, () => {
-  console.log(`\n 🗄️  server is bitchin' at http://${hostname}:${port} \n`);
+  console.log(
+    `\n 🗄️  server is running in ${process.env.NODE_ENV} mode at http://${hostname}:${port} \n`
+  );
 });
+// ******** END SERVER/ROUTER INITIALIZATION *********

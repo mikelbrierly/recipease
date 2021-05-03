@@ -6,13 +6,16 @@
   "configurations": [
     {
       "type": "node",
+      "env": {
+        "NODE_ENV": "dev"
+      },
       "request": "launch",
       "name": "nodemon",
       "runtimeExecutable": "nodemon",
-      "program": "${workspaceRoot}/serer.js",
+      "program": "${workspaceRoot}/server.js",
       "restart": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
-}
+    }
   ]
 }

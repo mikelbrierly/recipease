@@ -4,11 +4,11 @@
   "description": "A web app for meal planning and grocery shopping lists",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "dev": "export NODE_ENV=dev && nodemon server.js",
+    "devPm2": "export NODE_ENV=dev && ./node_modules/pm2/bin/pm2-runtime server.js",
+    "prod": "export NODE_ENV=prod && ./node_modules/pm2/bin/pm2-runtime server.js",
     "debug": "node debug server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-prod": "npx babel src --out-dir lib",
     "lint": "eslint api"
   },
   "engines": {
@@ -41,6 +41,8 @@
     "prettier": "^2.2.1"
   },
   "dependencies": {
-    "mongoose": "^5.12.5"
+    "config": "^3.3.6",
+    "mongoose": "^5.12.5",
+    "pm2": "^4.5.6"
   }
 }

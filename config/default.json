@@ -1,0 +1,8 @@
+{
+  "database": {
+    "host": "localhost",
+    "username": "[[redacted]]",
+    "password": "[[redacted]]",
+    "dbName": "recipease"
+  }
+}
