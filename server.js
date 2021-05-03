@@ -1,8 +1,11 @@
-const http = require('http');
+// const http = require('http');
 const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
 const tmpLocalConfig = require('./config');
+const ingredientRoutes = require('./api/routes/ingredientRoutes');
+const mealplanRoutes = require('./api/routes/mealplanRoutes');
+const recipeRoutes = require('./api/routes/recipeRoutes');
 require('./api/models/ingredientModel');
 
 const app = express();
@@ -28,9 +31,7 @@ mongoose.connect(dbConnectionString, {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
-  console.log(
-    `\n ~~ 🥳 successfully connected to db ${dbConnectionString} 🎉 ~~ \n`
-  );
+  console.log(`\n ~~ 🥳 successfully connected to db ${dbConnectionString} 🎉 ~~ \n`);
 });
 
 // ******** END DB *********
@@ -51,9 +52,13 @@ const port = 8080;
 //   // pass all requests to our custom router for logic, then this callback returns data to the caller
 //   router(req, (data) => res.end(JSON.stringify(data)));
 // });
-app.get('/', (req, res) => {
-  res.send('hello');
-});
+
+app.use(express.json()); // body-parser is included in the core Express framework now https://medium.com/@mmajdanski/express-body-parser-and-why-may-not-need-it-335803cd048c
+app.use('/ingredients', ingredientRoutes);
+
+//  TODO later after ingredient routes are all solid
+// app.use('/mealplans', mealplanRoutes);
+// app.use('/recipes', recipeRoutes);
 
 // server.listen(port, hostname, () => {
 //   console.log(
@@ -61,8 +66,6 @@ app.get('/', (req, res) => {
 //   );
 // });
 app.listen(port, () => {
-  console.log(
-    `\n 🗄️  server is running in ${process.env.NODE_ENV} mode at http://${hostname}:${port} \n`
-  );
+  console.log(`\n 🗄️  server is running in ${process.env.NODE_ENV} mode at http://${hostname}:${port} \n`);
 });
 // ******** END SERVER/ROUTER INITIALIZATION *********
