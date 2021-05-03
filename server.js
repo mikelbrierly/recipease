@@ -1,8 +1,11 @@
 const http = require('http');
 const mongoose = require('mongoose');
+const express = require('express');
 const config = require('config');
 const tmpLocalConfig = require('./config');
 require('./api/models/ingredientModel');
+
+const app = express();
 
 // ******** DB *********
 // break out db initialization to separate file
@@ -33,23 +36,31 @@ db.once('open', () => {
 // ******** END DB *********
 
 // ******** ROUTING *********
-const router = require('./api/router');
+// const router = require('./api/router');
 // ****** END ROUTING *******
 
 // ******** SERVER/ROUTER INITIALIZATION *********
 const hostname = 'localhost';
 const port = 8080;
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200, {
-    'Content-Type': 'application/json', // tell http header we will be sending json (?)
-  });
+// const server = http.createServer((req, res) => {
+//   res.writeHead(200, {
+//     'Content-Type': 'application/json', // tell http header we will be sending json (?)
+//   });
 
-  // pass all requests to our custom router for logic, then this callback returns data to the caller
-  router(req, (data) => res.end(JSON.stringify(data)));
+//   // pass all requests to our custom router for logic, then this callback returns data to the caller
+//   router(req, (data) => res.end(JSON.stringify(data)));
+// });
+app.get('/', (req, res) => {
+  res.send('hello');
 });
 
-server.listen(port, hostname, () => {
+// server.listen(port, hostname, () => {
+//   console.log(
+//     `\n 🗄️  server is running in ${process.env.NODE_ENV} mode at http://${hostname}:${port} \n`
+//   );
+// });
+app.listen(port, () => {
   console.log(
     `\n 🗄️  server is running in ${process.env.NODE_ENV} mode at http://${hostname}:${port} \n`
   );
