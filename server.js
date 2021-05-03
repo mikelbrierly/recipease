@@ -1,17 +1,15 @@
-// const http = require('http');
 const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
 const tmpLocalConfig = require('./config');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
-const mealplanRoutes = require('./api/routes/mealplanRoutes');
-const recipeRoutes = require('./api/routes/recipeRoutes');
+// const mealplanRoutes = require('./api/routes/mealplanRoutes');
+// const recipeRoutes = require('./api/routes/recipeRoutes');
 require('./api/models/ingredientModel');
 
 const app = express();
 
 // ******** DB *********
-// break out db initialization to separate file
 const dbHost = config.has('database.host') ? config.get('database.host') : '';
 const dbPort = config.has('database.port') ? config.get('database.port') : '';
 const dbConnectionString = dbPort ? `${dbHost}:${dbPort}` : dbHost;
@@ -33,25 +31,11 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
   console.log(`\n ~~ 🥳 successfully connected to db ${dbConnectionString} 🎉 ~~ \n`);
 });
-
 // ******** END DB *********
-
-// ******** ROUTING *********
-// const router = require('./api/router');
-// ****** END ROUTING *******
 
 // ******** SERVER/ROUTER INITIALIZATION *********
 const hostname = 'localhost';
 const port = 8080;
-
-// const server = http.createServer((req, res) => {
-//   res.writeHead(200, {
-//     'Content-Type': 'application/json', // tell http header we will be sending json (?)
-//   });
-
-//   // pass all requests to our custom router for logic, then this callback returns data to the caller
-//   router(req, (data) => res.end(JSON.stringify(data)));
-// });
 
 app.use(express.json()); // body-parser is included in the core Express framework now https://medium.com/@mmajdanski/express-body-parser-and-why-may-not-need-it-335803cd048c
 app.use('/ingredients', ingredientRoutes);
@@ -60,11 +44,6 @@ app.use('/ingredients', ingredientRoutes);
 // app.use('/mealplans', mealplanRoutes);
 // app.use('/recipes', recipeRoutes);
 
-// server.listen(port, hostname, () => {
-//   console.log(
-//     `\n 🗄️  server is running in ${process.env.NODE_ENV} mode at http://${hostname}:${port} \n`
-//   );
-// });
 app.listen(port, () => {
   console.log(`\n 🗄️  server is running in ${process.env.NODE_ENV} mode at http://${hostname}:${port} \n`);
 });

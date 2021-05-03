@@ -12,6 +12,6 @@
   "rules": {
     "prettier/prettier": ["error"],
     "no-console": "off",
-    "print-width": 120
+    "no-underscore-dangle": 0
   }
 }

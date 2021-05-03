@@ -10,23 +10,19 @@ router.use((req, res, next) => {
 });
 
 router.get('/', (req, res, next) => ingredients.getIngredients(req, res, next));
-router.get('/:id', (req, res, next) => ingredients.getIngredient(req, res, next));
-router.put('/:id/update', (req, res, next) => ingredients.updateIngredient(req, res, next));
-router.post('/create', (req, res, next) => ingredients.createIngredient(req, res, next));
+router.get('/:id', (req, res, next) =>
+  ingredients.getIngredient(req, res, next)
+);
+router.put('/:id/update', (req, res, next) =>
+  ingredients.updateIngredient(req, res, next)
+);
+router.post('/create', (req, res, next) =>
+  ingredients.createIngredient(req, res, next)
+);
 // figure out better way to seed db
 router.post('/seed', (req, res, next) => ingredients.seedDb(req, res, next));
-router.delete('/:id/delete', (req, res, next) => ingredients.deleteIngredient(req, res, next));
-
-// module.exports = (req, cb) => {
-//   if (req.method === 'GET')
-//     return ingredients.getIngredients(req, cb);
-//   if (req.method === 'POST')
-//     return ingredients.createIngredients(req, cb);
-//   if (req.method === 'PUT')
-//     return ingredients.updateIngredients(req, cb);
-//   if (req.method === 'DELETE')
-//     return ingredients.deleteIngredients(req, cb);
-//   return cb('Unsupported HTTP method');
-// };
+router.delete('/:id/delete', (req, res, next) =>
+  ingredients.deleteIngredient(req, res, next)
+);
 
 module.exports = router;
