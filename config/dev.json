@@ -1,5 +1,5 @@
 {
   "database": {
-    "host": "mongodb+srv://recipease0.5timp.mongodb.net/"
+    "host": "localhost"
   }
 }
