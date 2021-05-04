@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
 const tmpLocalConfig = require('./config');
+const authentication = require('./auth/authController');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
 // const mealplanRoutes = require('./api/routes/mealplanRoutes');
 // const recipeRoutes = require('./api/routes/recipeRoutes');
@@ -39,6 +40,7 @@ const hostname = 'localhost';
 const port = 8080;
 
 app.use(express.json()); // body-parser is included in the core Express framework now https://medium.com/@mmajdanski/express-body-parser-and-why-may-not-need-it-335803cd048c
+app.use('/api/auth', authentication);
 app.use('/ingredients', ingredientRoutes);
 
 //  TODO later after ingredient routes are all solid
