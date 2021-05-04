@@ -12,7 +12,8 @@ const app = express();
 // ******** DB *********
 const dbHost = config.has('database.host') ? config.get('database.host') : '';
 const dbPort = config.has('database.port') ? config.get('database.port') : '';
-const dbConnectionString = dbPort ? `${dbHost}:${dbPort}` : dbHost;
+const dbName = config.get('database.dbName');
+const dbConnectionString = dbPort ? `${dbHost}:${dbPort}/${dbName}` : `${dbHost}${dbName}`;
 
 if (!dbHost) {
   console.error('database configuration settings not set');

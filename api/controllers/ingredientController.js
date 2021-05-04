@@ -33,18 +33,18 @@ module.exports = {
   updateIngredient: (req, res, next) => {
     Ingredient.findByIdAndUpdate(req.params.id, { $set: req.body }, (err, ingredient) => {
       if (err) return next(new Error(err));
-      res.json(`successfully updated ${ingredient._id}`);
+      return res.json(`successfully updated ${ingredient._id}`);
     });
   },
 
   deleteIngredient: (req, res, next) => {
     Ingredient.findOneAndDelete({ _id: req.params.id }, (err, deletedDoc) => {
-      //add 404 check
+      // add 404 check
       if (err) return next(new Error(err));
       console.info(
         `Here's the deletedDoc in case we wanted to do an undo action or something like that - ${deletedDoc}`
       );
-      res.json(`${deletedDoc._id} was deleted`);
+      return res.json(`${deletedDoc._id} was deleted`);
     });
   },
 
