@@ -13,6 +13,7 @@ const tmpLocalConfig = require('../config');
 // const config = require('../config');
 
 const User = require('../api/models/userModel');
+const verifyToken = require('./middleware/verifyToken');
 
 router.post('/register', (req, res, next) => {
   const hashedPw = bcrypt.hashSync(req.body.password, 12);
@@ -35,23 +36,18 @@ router.post('/register', (req, res, next) => {
   );
 });
 
-router.get('/get-user', (req, res) => {
-  const token = req.headers.authorization.split(' ')[1];
-  if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
+// eslint-disable-next-line arrow-body-style
+router.get('/get-user', verifyToken, (req, res) => {
+  return User.findById(
+    req.userId,
+    { password: 0 }, // projection to omit the pw from the response
+    (error, user) => {
+      if (error) return res.status(500).send(`Error looking up user. ${error}`);
+      if (!user) return res.status(400).send('No user found');
 
-  return jwt.verify(token, tmpLocalConfig.secret, (err, decoded) => {
-    if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-    return User.findById(
-      decoded.id,
-      { password: 0 }, // projection to omit the pw from the response
-      (error, user) => {
-        if (error) return res.status(500).send(`Error looking up user. ${error}`);
-        if (!user) return res.status(400).send('No user found');
-
-        return res.status(200).json(user);
-      }
-    );
-  });
+      return res.status(200).json(user);
+    }
+  );
 });
 
 router.post('/login', (req, res) => {
