@@ -3,6 +3,6 @@
     "host": "localhost",
     "username": "[[redacted]]",
     "password": "[[redacted]]",
-    "dbName": "recipease"
+    "dbName": "recipeaseDev"
   }
 }
