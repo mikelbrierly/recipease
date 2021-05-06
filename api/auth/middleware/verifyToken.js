@@ -1,7 +1,11 @@
 const jwt = require('jsonwebtoken');
-const tmpLocalConfig = require('../../config');
+const tmpLocalConfig = require('../../../config');
 
 module.exports = (req, res, next) => {
+  if (!(req.headers && req.headers.authorization)) {
+    return res.status(403).json({ auth: false, message: 'No token provided' });
+  }
+
   const token = req.headers.authorization.split(' ')[1];
   if (!token) return res.status(403).json({ auth: false, message: 'No token provided' });
 
