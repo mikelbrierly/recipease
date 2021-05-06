@@ -1,19 +1,55 @@
-const express = require('express');
-
-const router = express.Router();
-router.use(express.urlencoded({ extended: false }));
-router.use(express.json());
-
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const { hashPassword } = require('../auth/middleware/password');
+
+// const express = require('express');
+// const router = express.Router();
+// router.use(express.urlencoded({ extended: false }));
+// router.use(express.json());
+
+// const bcrypt = require('bcrypt');
 
 // tmp local config is used until we can store sensitive data in AWS secrets manager.
 // config file is gitignored so it will never be availabe off of local
-const tmpLocalConfig = require('../config');
+const tmpLocalConfig = require('../../config');
 // const config = require('../config');
 
-const User = require('../api/models/userModel');
-const verifyToken = require('./middleware/verifyToken');
+const User = require('../models/userModel');
+// const verifyToken = require('../auth/middleware/verifyToken');
+
+module.exports = {
+  signup: (req, res, next) => {
+    try {
+      const { email, password, role } = req.body;
+      const hashedPw = hashPassword(password);
+      const newUser = new User({ email, password: hashedPw, role: role || 'basic' });
+      const accessToken = jwt.sign({ userId: newUser._id }, tmpLocalConfig.secret, {
+        expiresIn: '1d',
+      });
+      newUser.accessToken = accessToken;
+      newUser.save();
+      res.json({
+        data: newUser,
+        accessToken,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getUser: (req, res, next) => {
+    console.log('testing');
+  },
+
+  login: (req, res, next) => {
+    console.log('testing');
+  },
+
+  logout: (req, res, next) => {
+    console.log('testing');
+  },
+};
+
+/*
 
 router.post('/register', (req, res, next) => {
   const hashedPw = bcrypt.hashSync(req.body.password, 12);
@@ -71,3 +107,5 @@ router.get('/logout', (req, res) => {
 });
 
 module.exports = router;
+
+*/
