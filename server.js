@@ -5,6 +5,7 @@ const tmpLocalConfig = require('./config');
 // const authentication = require('./api/auth/middleware/verifyToken');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
 const userRoutes = require('./api/routes/userRoutes');
+const verifyToken = require('./api/auth/middleware/verifyToken');
 // const mealplanRoutes = require('./api/routes/mealplanRoutes');
 // const recipeRoutes = require('./api/routes/recipeRoutes');
 require('./api/models/ingredientModel');
@@ -24,7 +25,7 @@ if (!dbHost) {
 mongoose.connect(dbConnectionString, {
   useNewUrlParser: true, // https://arunrajeevan.medium.com/understanding-mongoose-connection-options-2b6e73d96de1
   useUnifiedTopology: true, // https://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/
-  // TODO: change this to an s3 bucket or something storing credentials securely
+  // TODO: change this to an s3 bucket or ENV variable for creds
   user: tmpLocalConfig.mongodb.username,
   pass: tmpLocalConfig.mongodb.password,
 });
@@ -41,6 +42,7 @@ const hostname = 'localhost';
 const port = 8080;
 
 app.use(express.json()); // body-parser is included in the core Express framework now https://medium.com/@mmajdanski/express-body-parser-and-why-may-not-need-it-335803cd048c
+app.use(verifyToken);
 // app.use('/api/auth', authentication);
 app.use('/ingredients', ingredientRoutes);
 app.use('/users', userRoutes);

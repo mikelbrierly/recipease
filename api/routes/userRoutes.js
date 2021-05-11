@@ -5,9 +5,7 @@ router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
 const userController = require('../controllers/userController');
 
-const placeholderMiddlewareFunc = () => console.log('placeholder middleware');
-
-router.post('/register', placeholderMiddlewareFunc, userController.signup);
+router.post('/register', userController.signup);
 // router.post('/register', (req, res, next) => {
 //   const hashedPw = bcrypt.hashSync(req.body.password, 12);
 
@@ -29,22 +27,7 @@ router.post('/register', placeholderMiddlewareFunc, userController.signup);
 //   );
 // });
 
-router.get('/get-user', placeholderMiddlewareFunc, userController.getUser);
-// eslint-disable-next-line arrow-body-style
-// router.get('/get-user', verifyToken, (req, res) => {
-//   return User.findById(
-//     req.userId,
-//     { password: 0 }, // projection to omit the pw from the response
-//     (error, user) => {
-//       if (error) return res.status(500).send(`Error looking up user. ${error}`);
-//       if (!user) return res.status(400).send('No user found');
-
-//       return res.status(200).json(user);
-//     }
-//   );
-// });
-
-router.post('/login', placeholderMiddlewareFunc, userController.login);
+router.post('/login', userController.login);
 // router.post('/login', (req, res) => {
 //   User.findOne({ email: req.body.email }, (err, user) => {
 //     if (err) return res.status(500).send('Server error');
@@ -59,7 +42,44 @@ router.post('/login', placeholderMiddlewareFunc, userController.login);
 //   });
 // });
 
-router.get('/logout', placeholderMiddlewareFunc, userController.logout);
+router.get(
+  '/',
+  userController.allowIfLoggedIn,
+  userController.grantAccess('readAny', 'profile'),
+  userController.getUsers
+);
+
+router.get('/:userId', userController.allowIfLoggedIn, userController.getUser);
+// router.get('/get-user', placeholderMiddlewareFunc, userController.getUser);
+// eslint-disable-next-line arrow-body-style
+// router.get('/get-user', verifyToken, (req, res) => {
+//   return User.findById(
+//     req.userId,
+//     { password: 0 }, // projection to omit the pw from the response
+//     (error, user) => {
+//       if (error) return res.status(500).send(`Error looking up user. ${error}`);
+//       if (!user) return res.status(400).send('No user found');
+
+//       return res.status(200).json(user);
+//     }
+//   );
+// });
+
+router.put(
+  '/:userId',
+  userController.allowIfLoggedIn,
+  userController.grantAccess('updateAny', 'profile'),
+  userController.updateUser
+);
+
+router.delete(
+  '/:userid',
+  userController.allowIfLoggedIn,
+  userController.grantAccess('deleteAny', 'profile'),
+  userController.deleteUser
+);
+
+router.get('/logout', userController.logout);
 // router.get('/logout', (req, res) => {
 //   // There is no actual difference between res.send and res.json, both methods are almost identical. res.json calls res.send at the end
 //   // main difference is res.json will convert non objects to json

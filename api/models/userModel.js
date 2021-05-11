@@ -8,6 +8,9 @@ const { Schema } = mongoose;
 //   password: String,
 // });
 const UserSchema = new Schema({
+  name: {
+    type: String,
+  },
   email: {
     type: String,
     required: true,
