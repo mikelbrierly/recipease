@@ -43,6 +43,14 @@ const port = 8080;
 
 app.use(express.json()); // body-parser is included in the core Express framework now https://medium.com/@mmajdanski/express-body-parser-and-why-may-not-need-it-335803cd048c
 app.use(verifyToken);
+
+// maybe logout should only be handled on the client side. Since the Bearer Token is sent as part of each request
+// app.use('/logout', (req, res) => {
+//   req.headers.authorization = null;
+//   res.locals.loggedInUser = null;
+//   res.status(200).json({ success: 'User has been successfully logged out' });
+// });
+
 // app.use('/api/auth', authentication);
 app.use('/ingredients', ingredientRoutes);
 app.use('/users', userRoutes);
