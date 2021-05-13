@@ -31,10 +31,18 @@ router.put(
 );
 
 router.delete(
-  '/:userid',
+  '/:userId',
   userController.allowIfLoggedIn,
   userController.grantAccess('deleteAny', 'profile'),
   userController.deleteUser
+);
+
+// admin route for granting supervisor and admin privileges
+router.put(
+  '/admin/register/:userId',
+  userController.allowIfLoggedIn,
+  userController.grantAdminAccess('updateAny', 'profile'),
+  userController.registerAdmin
 );
 
 module.exports = router;

@@ -12,13 +12,13 @@ const User = require('../models/userModel');
 module.exports = {
   register: async (req, res, next) => {
     try {
-      const { name, email, password, role } = req.body;
+      const { name, email, password } = req.body;
       const hashedPw = await hash(password);
       const newUser = new User({
         name: name.toLowerCase(),
         email: email.toLowerCase(),
         password: hashedPw,
-        role: role || 'basic',
+        role: 'basic',
       });
       const accessToken = jwt.sign({ userId: newUser._id }, tmpLocalConfig.secret, {
         expiresIn: '1d',
@@ -48,7 +48,7 @@ module.exports = {
       });
       await User.findByIdAndUpdate(user._id, { accessToken });
       return res.status(200).json({
-        data: { email: user.email, role: user.role },
+        data: { email: user.email, role: user.role, _id: user._id },
         accessToken,
       });
     } catch (error) {
@@ -82,34 +82,91 @@ module.exports = {
 
   updateUser: async (req, res, next) => {
     try {
-      // TODO: lowercase all updates
-      const update = req.body;
       const { userId } = req.params;
-      await User.findByIdAndUpdate(userId, update);
+
+      // prevent sensitive data from being updated by creating a safeUpdate that removes role, _id, and JWT
+      const { role, _id, accessToken, ...safeUpdate } = req.body;
+
+      // sanitize (lowercase) all string updates to the user object
+      const sanitizedUpdate = Object.keys(safeUpdate).reduce((acc, item) => {
+        if (typeof item === 'string') {
+          acc[item] = safeUpdate[item].toLowerCase();
+        }
+        return acc;
+      }, {});
+
+      if (!Object.keys(sanitizedUpdate).length) return res.status(200).json('No valid changes made to user');
+
+      // update user in the db
+      await User.findByIdAndUpdate(userId, sanitizedUpdate);
       const user = await User.findById(
         userId,
         { password: 0 } // projection to omit the pw from the response
       );
-      res.status(200).json({
-        data: user,
+      return res.status(200).json({
         message: 'User has been updated',
+        updatedUser: user,
       });
     } catch (error) {
-      next(error);
+      return next(error);
     }
   },
 
   deleteUser: async (req, res, next) => {
     try {
       const { userId } = req.params;
+      if (!userId) res.status(500).json({ error: 'no userId passed in to delete call' });
       await User.findByIdAndDelete(userId);
       res.status(200).json({
-        data: null,
         message: 'User has been deleted',
       });
     } catch (error) {
       next(error);
     }
+  },
+
+  registerAdmin: async (req, res, next) => {
+    try {
+      const { userId } = req.params;
+      const { role } = req.body;
+
+      // TODO: create separate helper function for trimming and sanitizing inputs
+      if (!userId || !userId.trim())
+        return res
+          .status(200)
+          .json('Missing userId. You must create a base user before upgrading the role to admin/supervisor');
+      if (!role || !role.trim()) return res.status(200).json('No role change passed in');
+
+      // update user in the db
+      await User.findByIdAndUpdate(userId, { role: role.toLowerCase() });
+      const user = await User.findById(
+        userId,
+        { password: 0 } // projection to omit the pw from the response
+      );
+      return res.status(200).json({
+        message: `User role has successfully been updated to ${role.toLowerCase()}.`,
+        updatedUser: user,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  // eslint-disable-next-line arrow-body-style
+  grantAdminAccess: (action, resource) => {
+    return (req, res, next) => {
+      try {
+        const permission = roles.can(req.user.role)[action](resource).granted; // allow access to admins
+        if (!permission) {
+          return res.status(401).json({
+            error: "You don't have enough permission to perform this action",
+          });
+        }
+        return next();
+      } catch (error) {
+        return next(error);
+      }
+    };
   },
 
   // eslint-disable-next-line arrow-body-style
