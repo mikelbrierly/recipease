@@ -3,12 +3,6 @@ const express = require('express');
 const router = express.Router();
 const ingredients = require('../controllers/ingredientController');
 
-// middleware to be run specific for the ingredient routes
-router.use((req, res, next) => {
-  console.log('log from ingredients route middleware');
-  next();
-});
-
 router.get('/', (req, res, next) => ingredients.getIngredients(req, res, next));
 router.get('/:id', (req, res, next) => ingredients.getIngredient(req, res, next));
 router.put('/:id/update', (req, res, next) => ingredients.updateIngredient(req, res, next));
