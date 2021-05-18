@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "accesscontrol": "^2.2.1",
+    "aws-sdk": "^2.908.0",
     "bcrypt": "^5.0.1",
     "config": "^3.3.6",
     "express": "^4.17.1",

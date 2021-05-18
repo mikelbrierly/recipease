@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
+// const secretsConfig = require('./secrets');
 const tmpLocalConfig = require('./config');
 // const authentication = require('./api/auth/middleware/verifyToken');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
@@ -28,6 +29,8 @@ mongoose.connect(dbConnectionString, {
   // TODO: change this to an s3 bucket or ENV variable for creds
   user: tmpLocalConfig.mongodb.username,
   pass: tmpLocalConfig.mongodb.password,
+  // user: secretsConfig.mongodb.username,
+  // pass: secretsConfig.mongodb.password,
 });
 
 const db = mongoose.connection;
