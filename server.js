@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
-// const secretsConfig = require('./secrets');
-const tmpLocalConfig = require('./config');
-// const authentication = require('./api/auth/middleware/verifyToken');
+const { getSecret } = require('./secrets');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
 const userRoutes = require('./api/routes/userRoutes');
 const verifyToken = require('./api/auth/middleware/verifyToken');
@@ -23,20 +21,20 @@ if (!dbHost) {
   console.error('database configuration settings not set');
 }
 
-mongoose.connect(dbConnectionString, {
-  useNewUrlParser: true, // https://arunrajeevan.medium.com/understanding-mongoose-connection-options-2b6e73d96de1
-  useUnifiedTopology: true, // https://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/
-  // TODO: change this to an s3 bucket or ENV variable for creds
-  user: tmpLocalConfig.mongodb.username,
-  pass: tmpLocalConfig.mongodb.password,
-  // user: secretsConfig.mongodb.username,
-  // pass: secretsConfig.mongodb.password,
-});
+// TODO: clean up this trash and make this middleware or something rather than initializing a new secrets manager connection every time I need it
+getSecret((secrets) => {
+  mongoose.connect(dbConnectionString, {
+    useNewUrlParser: true, // https://arunrajeevan.medium.com/understanding-mongoose-connection-options-2b6e73d96de1
+    useUnifiedTopology: true, // https://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/
+    user: secrets.mongodb.username,
+    pass: secrets.mongodb.password,
+  });
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-  console.log(`\n ~~ 🥳 successfully connected to db ${dbConnectionString} 🎉 ~~ \n`);
+  const db = mongoose.connection;
+  db.on('error', console.error.bind(console, 'connection error:'));
+  db.once('open', () => {
+    console.log(`\n ~~ 🥳 successfully connected to db ${dbConnectionString} 🎉 ~~ \n`);
+  });
 });
 // ******** END DB *********
 
@@ -58,7 +56,7 @@ app.use(verifyToken);
 app.use('/ingredients', ingredientRoutes);
 app.use('/users', userRoutes);
 
-//  TODO later after ingredient routes are all solid
+//  TODO: work on this later after ingredient routes are all solid
 // app.use('/mealplans', mealplanRoutes);
 // app.use('/recipes', recipeRoutes);
 
