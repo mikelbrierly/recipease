@@ -1,6 +1,14 @@
+// TODO: (maybe) should I just wrap this entire file in an async block?
+
+// TODO: update linter to remove these two rules
+/* eslint-disable no-return-await */
+/* eslint-disable arrow-body-style */
+
 const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
+// TODO: this is still a problem because we make a request to AWS to retrieve secrets every time this func is called. We need to cache the value of the secrets somewhere like res.locals
+// res.locals won't work, but maybe app.locals
 const { getSecret } = require('./secrets');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
 const userRoutes = require('./api/routes/userRoutes');
@@ -21,8 +29,9 @@ if (!dbHost) {
   console.error('database configuration settings not set');
 }
 
-// TODO: clean up this trash and make this middleware or something rather than initializing a new secrets manager connection every time I need it
-getSecret((secrets) => {
+const dbConnect = async () => {
+  // TODO: clean up this trash and make this middleware or something rather than initializing a new secrets manager connection every time I need it
+  const secrets = await getSecret();
   mongoose.connect(dbConnectionString, {
     useNewUrlParser: true, // https://arunrajeevan.medium.com/understanding-mongoose-connection-options-2b6e73d96de1
     useUnifiedTopology: true, // https://mongodb.github.io/node-mongodb-native/3.3/reference/unified-topology/
@@ -35,32 +44,39 @@ getSecret((secrets) => {
   db.once('open', () => {
     console.log(`\n ~~ 🥳 successfully connected to db ${dbConnectionString} 🎉 ~~ \n`);
   });
+};
+
+dbConnect().catch((err) => {
+  // TODO: better error handling
+  console.error(err);
 });
 // ******** END DB *********
 
-// ******** SERVER/ROUTER INITIALIZATION *********
-const hostname = 'localhost';
-const port = 8080;
-
+// ******** ROUTING *********
 app.use(express.json()); // body-parser is included in the core Express framework now https://medium.com/@mmajdanski/express-body-parser-and-why-may-not-need-it-335803cd048c
 app.use(verifyToken);
 
-// maybe logout should only be handled on the client side. Since the Bearer Token is sent as part of each request
+// TODO: figure out logout. maybe it should only be handled on the client side. Since the Bearer Token is sent as part of each request
 // app.use('/logout', (req, res) => {
 //   req.headers.authorization = null;
 //   res.locals.loggedInUser = null;
 //   res.status(200).json({ success: 'User has been successfully logged out' });
 // });
 
-// app.use('/api/auth', authentication);
 app.use('/ingredients', ingredientRoutes);
 app.use('/users', userRoutes);
 
-//  TODO: work on this later after ingredient routes are all solid
+//  TODO: work on this later after ingredient and user routes are all solid
 // app.use('/mealplans', mealplanRoutes);
 // app.use('/recipes', recipeRoutes);
+
+// ******** END ROUTING *********
+
+// ******** SERVER INITIALIZATION *********
+const hostname = 'localhost';
+const port = 8080;
 
 app.listen(port, () => {
   console.log(`\n 🗄️  server is running in ${process.env.NODE_ENV} mode at http://${hostname}:${port} \n`);
 });
-// ******** END SERVER/ROUTER INITIALIZATION *********
+// ******** END SERVER INITIALIZATION *********

@@ -20,42 +20,45 @@ const client = new AWS.SecretsManager({
 // We rethrow the exception by default.
 
 module.exports = {
-  getSecret: async (cb) => {
-    client.getSecretValue({ SecretId: secretName }, (err, data) => {
-      if (err) {
-        if (err.code === 'DecryptionFailureException')
-          // Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-          // Deal with the exception here, and/or rethrow at your discretion.
-          throw err;
-        else if (err.code === 'InternalServiceErrorException')
-          // An error occurred on the server side.
-          // Deal with the exception here, and/or rethrow at your discretion.
-          throw err;
-        else if (err.code === 'InvalidParameterException')
-          // You provided an invalid value for a parameter.
-          // Deal with the exception here, and/or rethrow at your discretion.
-          throw err;
-        else if (err.code === 'InvalidRequestException')
-          // You provided a parameter value that is not valid for the current state of the resource.
-          // Deal with the exception here, and/or rethrow at your discretion.
-          throw err;
-        else if (err.code === 'ResourceNotFoundException')
-          // We can't find the resource that you asked for.
-          // Deal with the exception here, and/or rethrow at your discretion.
-          throw err;
-      } else {
-        // Decrypts secret using the associated KMS CMK.
-        // Depending on whether the secret is a string or binary, one of these fields will be populated.
-        // eslint-disable-next-line no-lonely-if
-        if ('SecretString' in data) {
-          secret = data.SecretString;
+  // this doesn't need to be an async function since we manually return a promise, allowing it to be called with async/await
+  getSecret: () => {
+    const promisifiedSecrets = new Promise((resolve, reject) => {
+      client.getSecretValue({ SecretId: secretName }, (err, data) => {
+        if (err) {
+          if (err.code === 'DecryptionFailureException')
+            // Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+            // TODO: add actual error handling here
+            reject(err);
+          else if (err.code === 'InternalServiceErrorException')
+            // An error occurred on the server side.
+            // TODO: add actual error handling here
+            reject(err);
+          else if (err.code === 'InvalidParameterException')
+            // You provided an invalid value for a parameter.
+            // TODO: add actual error handling here
+            reject(err);
+          else if (err.code === 'InvalidRequestException')
+            // You provided a parameter value that is not valid for the current state of the resource.
+            // TODO: add actual error handling here
+            reject(err);
+          else if (err.code === 'ResourceNotFoundException')
+            // We can't find the resource that you asked for.
+            // TODO: add actual error handling here
+            reject(err);
         } else {
-          const buff = Buffer.from(data.SecretBinary, 'base64');
-          decodedBinarySecret = buff.toString('ascii');
+          // Decrypts secret using the associated KMS CMK.
+          // Depending on whether the secret is a string or binary, one of these fields will be populated.
+          // eslint-disable-next-line no-lonely-if
+          if ('SecretString' in data) {
+            secret = data.SecretString;
+          } else {
+            const buff = Buffer.from(data.SecretBinary, 'base64');
+            decodedBinarySecret = buff.toString('ascii');
+          }
         }
-      }
-      // TODO: refactor to use async/await not callbacks
-      return decodedBinarySecret ? cb(JSON.parse(decodedBinarySecret)) : cb(JSON.parse(secret));
+        resolve(decodedBinarySecret ? JSON.parse(decodedBinarySecret) : JSON.parse(secret));
+      });
     });
+    return promisifiedSecrets;
   },
 };

@@ -1,20 +1,25 @@
 const jwt = require('jsonwebtoken');
+// TODO: this is still a problem because we make a request to AWS to retrieve secrets every time this func is called. We need to cache the value of the secrets somewhere like res.locals
 const { getSecret } = require('../../../secrets');
 const User = require('../../models/userModel');
 
 module.exports = (req, res, next) => {
-  // todo: wrap in try/catch block?
-  if (!(req.headers && req.headers.authorization)) {
-    // return res.status(403).json({ auth: false, message: 'No token provided' });
-    return next(); // since this is used as a middleware we don't want to block continuing in case of login
-  }
+  // TODO: wrap in try/catch block?
+  if (!(req.headers && req.headers.authorization)) return next(); // since this is used as a middleware we don't want to block continuing in case of login
 
   const token = req.headers.authorization.split(' ')[1];
   if (!token) return res.status(403).json({ auth: false, message: 'No token provided' });
 
-  // TODO: refactor this to use async/await instead of a callback
-  // also TODO: fix the linter so it doesnt remove brackets from immediate return arrow funcs
-  return getSecret((secrets) =>
+  // TODO: fix the linter so it doesnt remove brackets from immediate return arrow funcs
+  const verify = async () => {
+    const setLocalSecrets = async () => {
+      res.locals.secrets = await getSecret();
+      return res.locals.secrets;
+    };
+
+    // if we have previously retrieved the secrets, then just get the cached ones from res.locals
+    const secrets = res.locals.secrets ? res.locals.secrets : await setLocalSecrets();
+
     jwt.verify(token, secrets.secret, async (err, decoded) => {
       if (err)
         return res.status(500).json({ auth: false, message: 'Could not authenticate token', error: err.message });
@@ -27,6 +32,7 @@ module.exports = (req, res, next) => {
         return res.status(401).json({ error: 'JWT token has expired, please login again' });
       }
       return next();
-    })
-  );
+    });
+  };
+  return verify().catch((err) => res.status(500).json({ error: err }));
 };

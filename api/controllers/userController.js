@@ -1,11 +1,10 @@
+/* eslint-disable arrow-body-style */
 const jwt = require('jsonwebtoken');
 const { hash, validate } = require('../auth/middleware/password');
 const { roles } = require('../auth/middleware/roles');
 
-// tmp local config is used until we can store sensitive data in AWS secrets manager.
-// config file is gitignored so it will never be availabe off of local
-const tmpLocalConfig = require('../../config');
-// const config = require('../config');
+// TODO: this is still a problem because we make a request to AWS to retrieve secrets every time this func is called. We need to cache the value of the secrets somewhere like res.locals
+const { getSecret } = require('../../secrets');
 
 const User = require('../models/userModel');
 
@@ -14,13 +13,14 @@ module.exports = {
     try {
       const { name, email, password } = req.body;
       const hashedPw = await hash(password);
+      const secrets = await getSecret();
       const newUser = new User({
         name: name.toLowerCase(),
         email: email.toLowerCase(),
         password: hashedPw,
         role: 'basic',
       });
-      const accessToken = jwt.sign({ userId: newUser._id }, tmpLocalConfig.secret, {
+      const accessToken = jwt.sign({ userId: newUser._id }, secrets.secret, {
         expiresIn: '1d',
       });
       newUser.accessToken = accessToken;
@@ -43,7 +43,8 @@ module.exports = {
       const validPw = await validate(password, user.password);
       if (!validPw) return res.status(401).json({ error: 'Incorrect password' });
 
-      const accessToken = jwt.sign({ userId: user._id }, tmpLocalConfig.secret, {
+      const secrets = await getSecret();
+      const accessToken = jwt.sign({ userId: user._id }, secrets.secret, {
         expiresIn: '1d',
       });
       await User.findByIdAndUpdate(user._id, { accessToken });
@@ -152,7 +153,6 @@ module.exports = {
     }
   },
 
-  // eslint-disable-next-line arrow-body-style
   grantAdminAccess: (action, resource) => {
     return (req, res, next) => {
       try {
@@ -169,7 +169,6 @@ module.exports = {
     };
   },
 
-  // eslint-disable-next-line arrow-body-style
   grantAccess: (action, resource) => {
     return (req, res, next) => {
       try {
