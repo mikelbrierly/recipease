@@ -1,15 +1,47 @@
 const express = require('express');
 
 const router = express.Router();
-const ingredients = require('../controllers/ingredientController');
+router.use(express.urlencoded({ extended: false }));
+router.use(express.json());
+const ingredientController = require('../controllers/ingredientController');
+const userController = require('../controllers/userController');
 
-router.get('/', (req, res, next) => ingredients.getIngredients(req, res, next));
-router.get('/:id', (req, res, next) => ingredients.getIngredient(req, res, next));
-router.put('/:id/update', (req, res, next) => ingredients.updateIngredient(req, res, next));
-router.post('/create', (req, res, next) => ingredients.createIngredient(req, res, next));
-router.delete('/:id/delete', (req, res, next) => ingredients.deleteIngredient(req, res, next));
+router.get(
+  '/',
+  userController.allowIfLoggedIn,
+  // ingredientController.permission('readAny', 'ingredient'), // TODO: look at all the permissions in this file and re-evaluate
+  ingredientController.getIngredients
+);
 
-// figure out better way to seed db
-router.post('/seed', (req, res, next) => ingredients.seedDb(req, res, next));
+router.get(
+  '/:ingredientId',
+  userController.allowIfLoggedIn,
+  // ingredientController.permission('readAny', 'ingredient'), // TODO: look at all the permissions in this file and re-evaluate
+  ingredientController.getIngredient
+);
+
+router.post(
+  '/create',
+  userController.allowIfLoggedIn,
+  ingredientController.permission('createOwn', 'ingredient'),
+  ingredientController.createIngredient
+);
+
+router.put(
+  '/:ingredientId/update',
+  userController.allowIfLoggedIn,
+  ingredientController.permission('updateOwn', 'ingredient'),
+  ingredientController.updateIngredient
+);
+
+router.delete(
+  '/:ingredientId/delete',
+  userController.allowIfLoggedIn,
+  ingredientController.permission('deleteOwn', 'ingredient'),
+  ingredientController.deleteIngredient
+);
+
+// TODO: figure out better way to seed db
+router.post('/seed', (req, res, next) => ingredientController.seedDb(req, res, next));
 
 module.exports = router;

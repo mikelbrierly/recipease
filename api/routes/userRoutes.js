@@ -12,28 +12,28 @@ router.post('/login', userController.login);
 router.get(
   '/',
   userController.allowIfLoggedIn,
-  userController.grantAccess('readAny', 'profile'),
+  userController.permission('readAny', 'profile'),
   userController.getUsers
 );
 
 router.get(
   '/:userId',
   userController.allowIfLoggedIn,
-  userController.grantAccess('readAny', 'profile'),
+  userController.permission('readAny', 'profile'),
   userController.getUser
 );
 
 router.put(
   '/:userId',
   userController.allowIfLoggedIn,
-  userController.grantAccess('updateAny', 'profile'),
+  userController.permission('updateAny', 'profile'),
   userController.updateUser
 );
 
 router.delete(
   '/:userId',
   userController.allowIfLoggedIn,
-  userController.grantAccess('deleteAny', 'profile'),
+  userController.permission('deleteAny', 'profile'),
   userController.deleteUser
 );
 

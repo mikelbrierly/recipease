@@ -10,6 +10,7 @@ const IngredientSchema = new Schema({
   category: String,
   shelf_life: Number,
   units: [String],
+  createdBy: String,
 });
 
 module.exports = mongoose.model('Ingredient', IngredientSchema);

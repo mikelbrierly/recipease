@@ -169,7 +169,7 @@ module.exports = {
     };
   },
 
-  grantAccess: (action, resource) => {
+  permission: (action, resource) => {
     return (req, res, next) => {
       try {
         const permission = roles.can(req.user.role)[action](resource).granted; // allow access to supervisors and admins

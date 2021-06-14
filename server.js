@@ -7,8 +7,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const config = require('config');
-// TODO: this is still a problem because we make a request to AWS to retrieve secrets every time this func is called. We need to cache the value of the secrets somewhere like res.locals
-// res.locals won't work, but maybe app.locals
 const { getSecret } = require('./secrets');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
 const userRoutes = require('./api/routes/userRoutes');
@@ -30,7 +28,6 @@ if (!dbHost) {
 }
 
 const dbConnect = async () => {
-  // TODO: clean up this trash and make this middleware or something rather than initializing a new secrets manager connection every time I need it
   const secrets = await getSecret();
   mongoose.connect(dbConnectionString, {
     useNewUrlParser: true, // https://arunrajeevan.medium.com/understanding-mongoose-connection-options-2b6e73d96de1

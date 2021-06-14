@@ -5,9 +5,9 @@ const User = require('../../models/userModel');
 
 module.exports = (req, res, next) => {
   // TODO: wrap in try/catch block?
-  if (!(req.headers && req.headers.authorization)) return next(); // since this is used as a middleware we don't want to block continuing in case of login
+  if (!(req.headers && req.headers.authorization) && req.url.includes('login')) return next(); // since this is used as a middleware we don't want to block continuing in case of login
 
-  const token = req.headers.authorization.split(' ')[1];
+  const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : ''; // prevent undefined typeError
   if (!token) return res.status(403).json({ auth: false, message: 'No token provided' });
 
   // TODO: fix the linter so it doesnt remove brackets from immediate return arrow funcs
