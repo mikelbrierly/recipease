@@ -12,7 +12,7 @@ const ingredientRoutes = require('./api/routes/ingredientRoutes');
 const userRoutes = require('./api/routes/userRoutes');
 const verifyToken = require('./api/auth/middleware/verifyToken');
 const recipeRoutes = require('./api/routes/recipeRoutes');
-// const mealplanRoutes = require('./api/routes/mealplanRoutes');
+const mealplanRoutes = require('./api/routes/mealplanRoutes');
 require('./api/models/ingredientModel');
 
 const app = express();
@@ -63,7 +63,7 @@ app.use(verifyToken);
 app.use('/ingredients', ingredientRoutes);
 app.use('/users', userRoutes);
 app.use('/recipes', recipeRoutes);
-// app.use('/mealplans', mealplanRoutes);
+app.use('/mealplans', mealplanRoutes);
 
 // ******** END ROUTING *********
 
