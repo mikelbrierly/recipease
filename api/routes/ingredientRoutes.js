@@ -5,39 +5,41 @@ router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
 const ingredientController = require('../controllers/ingredientController');
 const userController = require('../controllers/userController');
+// const { permissionTo } = require('../helpers/genericHelpers');
 
 router.get(
   '/',
   userController.allowIfLoggedIn,
-  // ingredientController.permission('readAny', 'ingredient'), // TODO: look at all the permissions in this file and re-evaluate
+  // ingredientController.permissionTo('readAny', 'ingredient'), // TODO: look at all the permissions in this file and re-evaluate
   ingredientController.getIngredients
 );
 
 router.get(
   '/:ingredientId',
   userController.allowIfLoggedIn,
-  // ingredientController.permission('readAny', 'ingredient'), // TODO: look at all the permissions in this file and re-evaluate
+  // ingredientController.permissionTo('readAny', 'ingredient'), // TODO: look at all the permissions in this file and re-evaluate
+  // permissionTo('readAny', 'ingredient'),
   ingredientController.getIngredient
 );
 
 router.post(
   '/create',
   userController.allowIfLoggedIn,
-  ingredientController.permission('createOwn', 'ingredient'),
+  ingredientController.permissionTo('createOwn', 'ingredient'),
   ingredientController.createIngredient
 );
 
 router.put(
   '/:ingredientId/update',
   userController.allowIfLoggedIn,
-  ingredientController.permission('updateOwn', 'ingredient'),
+  ingredientController.permissionTo('updateOwn', 'ingredient'),
   ingredientController.updateIngredient
 );
 
 router.delete(
   '/:ingredientId/delete',
   userController.allowIfLoggedIn,
-  ingredientController.permission('deleteOwn', 'ingredient'),
+  ingredientController.permissionTo('deleteOwn', 'ingredient'),
   ingredientController.deleteIngredient
 );
 

@@ -2,20 +2,18 @@
 const mongoose = require('mongoose');
 require('../models/mealplanModel');
 const { roles } = require('../auth/middleware/roles');
+const { isAccessingOwn } = require('../helpers/genericHelpers');
 
 mongoose.set('useFindAndModify', false); // https://mongoosejs.com/docs/deprecations.html#findandmodify
 const Mealplan = mongoose.model('Mealplan');
 
-// TODO: take a look at this and see if it can be refactored into a middleware or something. Feels a little funky to me
-const isAccessingOwn = (userId, createdById) => !createdById || userId === createdById;
-
 module.exports = {
   // TODO: break this out into an exported helper function since it's used all over the controllers
-  permission: (action, resource) => {
+  permissionTo: (action, resource) => {
     return (req, res, next) => {
       try {
-        const permission = roles.can(req.user.role)[action](resource).granted;
-        if (!permission) {
+        const permissionTo = roles.can(req.user.role)[action](resource).granted;
+        if (!permissionTo) {
           return res.status(401).json({
             error: "You don't have enough permission to perform this action",
           });
@@ -45,7 +43,7 @@ module.exports = {
       // return the mealplan only if it was created by the calling user, or if it is generic
       // TODO: allow access to admins
       if (isAccessingOwn(req.user.id, mealplan.createdBy)) return res.json(mealplan);
-      return next(new Error("ERROR: you don't have permission to access this resource"));
+      return next(new Error("ERROR: you don't have permissionTo to access this resource"));
     });
   },
 
@@ -70,7 +68,7 @@ module.exports = {
           return res.json(`successfully updated ${mealplan._id}`);
         });
       } else {
-        return next(new Error("ERROR: you don't have permission to access this resource"));
+        return next(new Error("ERROR: you don't have permissionTo to access this resource"));
       }
     });
   },
@@ -90,7 +88,7 @@ module.exports = {
           return res.json(`${deletedDoc._id} was deleted`);
         });
       } else {
-        return next(new Error("ERROR: you don't have permission to delete this resource"));
+        return next(new Error("ERROR: you don't have permissionTo to delete this resource"));
       }
     });
   },

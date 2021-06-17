@@ -2,19 +2,18 @@
 const mongoose = require('mongoose');
 require('../models/ingredientModel');
 const { roles } = require('../auth/middleware/roles');
+const { isAccessingOwn } = require('../helpers/genericHelpers');
 
 mongoose.set('useFindAndModify', false); // https://mongoosejs.com/docs/deprecations.html#findandmodify
 const Ingredient = mongoose.model('Ingredient');
 
-// TODO: take a look at this and see if it can be refactored into a middleware or something. Feels a little funky to me
-const isAccessingOwn = (userId, createdById) => !createdById || userId === createdById;
-
 module.exports = {
-  permission: (action, resource) => {
+  // TODO: break this out into a helper function
+  permissionTo: (action, resource) => {
     return (req, res, next) => {
       try {
-        const permission = roles.can(req.user.role)[action](resource).granted;
-        if (!permission) {
+        const permissionTo = roles.can(req.user.role)[action](resource).granted;
+        if (!permissionTo) {
           return res.status(401).json({
             error: "You don't have enough permission to perform this action",
           });
@@ -41,6 +40,9 @@ module.exports = {
       return next(new Error(`invalid mongo _id, expected 12 bit id, but recieved ${req.params.ingredientId}`));
     return Ingredient.findById(req.params.ingredientId, (err, ingredient) => {
       if (err) return next(new Error(err));
+      // TODO: maybe just return an empty array instead of an error message?
+      if (!ingredient)
+        return res.status(404).json([`ERROR: no ingredient found with the id ${req.params.ingredientId}`]);
       // return the ingredient only if it was created by the calling user, or if it is generic
       if (isAccessingOwn(req.user.id, ingredient.createdBy)) return res.json(ingredient);
       return next(new Error("ERROR: you don't have permission to access this resource"));
@@ -51,7 +53,7 @@ module.exports = {
     // TODO: paginate responses
     Ingredient.find({}, (err, ingredients) => {
       if (err) return next(new Error(err));
-      // this filters the ingredients to only return generic and the users own ingredients
+      // this filters out ingredients owned by other users
       const allowedIngredients = ingredients.filter((ingredient) => isAccessingOwn(req.user.id, ingredient.createdBy));
       return res.json(allowedIngredients);
     });

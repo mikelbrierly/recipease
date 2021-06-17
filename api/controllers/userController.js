@@ -156,8 +156,8 @@ module.exports = {
   grantAdminAccess: (action, resource) => {
     return (req, res, next) => {
       try {
-        const permission = roles.can(req.user.role)[action](resource).granted; // allow access to admins
-        if (!permission) {
+        const permissionTo = roles.can(req.user.role)[action](resource).granted; // allow access to admins
+        if (!permissionTo) {
           return res.status(401).json({
             error: "You don't have enough permission to perform this action",
           });
@@ -169,12 +169,12 @@ module.exports = {
     };
   },
 
-  permission: (action, resource) => {
+  permissionTo: (action, resource) => {
     return (req, res, next) => {
       try {
-        const permission = roles.can(req.user.role)[action](resource).granted; // allow access to supervisors and admins
+        const permissionTo = roles.can(req.user.role)[action](resource).granted; // allow access to supervisors and admins
         if (req.userId === req.params.userId) return next(); // if user is accessing their own profile, allow access
-        if (!permission) {
+        if (!permissionTo) {
           return res.status(401).json({
             error: "You don't have enough permission to perform this action",
           });
