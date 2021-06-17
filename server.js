@@ -11,8 +11,8 @@ const { getSecret } = require('./secrets');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
 const userRoutes = require('./api/routes/userRoutes');
 const verifyToken = require('./api/auth/middleware/verifyToken');
+const recipeRoutes = require('./api/routes/recipeRoutes');
 // const mealplanRoutes = require('./api/routes/mealplanRoutes');
-// const recipeRoutes = require('./api/routes/recipeRoutes');
 require('./api/models/ingredientModel');
 
 const app = express();
@@ -62,10 +62,8 @@ app.use(verifyToken);
 
 app.use('/ingredients', ingredientRoutes);
 app.use('/users', userRoutes);
-
-//  TODO: work on this later after ingredient and user routes are all solid
+app.use('/recipes', recipeRoutes);
 // app.use('/mealplans', mealplanRoutes);
-// app.use('/recipes', recipeRoutes);
 
 // ******** END ROUTING *********
 

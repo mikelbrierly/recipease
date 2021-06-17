@@ -10,9 +10,13 @@ module.exports = {
       .createOwn('ingredient')
       .readOwn('ingredient')
       .updateOwn('ingredient')
-      .deleteOwn('ingredient');
+      .deleteOwn('ingredient')
+      .createOwn('recipe')
+      .readOwn('recipe')
+      .updateOwn('recipe')
+      .deleteOwn('recipe');
 
-    ac.grant('supervisor').extend('basic').readAny('profile').readAny('ingredient');
+    ac.grant('supervisor').extend('basic').readAny('profile').readAny('ingredient').readAny('recipe');
 
     ac.grant('admin')
       .extend('basic')
@@ -20,7 +24,9 @@ module.exports = {
       .updateAny('profile')
       .deleteAny('profile')
       .updateAny('ingredient')
-      .deleteAny('ingredient');
+      .deleteAny('ingredient')
+      .updateAny('recipe')
+      .deleteAny('recipe');
 
     return ac;
   })(),
