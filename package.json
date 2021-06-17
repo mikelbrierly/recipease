@@ -8,7 +8,7 @@
     "devPm2": "export NODE_ENV=dev && ./node_modules/pm2/bin/pm2-runtime server.js",
     "prod": "export NODE_ENV=prod && ./node_modules/pm2/bin/pm2-runtime server.js",
     "debug": "node debug server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jasmine",
     "lint": "eslint api"
   },
   "engines": {
@@ -37,6 +37,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^1.7.0",
+    "jasmine": "^3.7.0",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1"
   },
