@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const mongoosePaginate = require('mongoose-paginate-v2');
+
 const { Schema } = mongoose;
 
 const recipeSchema = new Schema({
@@ -47,5 +49,7 @@ const recipeSchema = new Schema({
     type: String,
   },
 });
+
+recipeSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Recipe', recipeSchema);

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const { Schema } = mongoose;
 
@@ -37,5 +38,7 @@ const mealplanSchema = new Schema({
     type: String,
   },
 });
+
+mealplanSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Mealplan', mealplanSchema);

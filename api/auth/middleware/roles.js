@@ -19,14 +19,24 @@ module.exports = {
       .createOwn('mealplan')
       .readOwn('mealplan')
       .updateOwn('mealplan')
-      .deleteOwn('mealplan');
+      .deleteOwn('mealplan')
+      .createOwn('fridgeIngredient')
+      .readOwn('fridgeIngredient')
+      .updateOwn('fridgeIngredient')
+      .deleteOwn('fridgeIngredient')
+      .createOwn('shoppingList')
+      .readOwn('shoppingList')
+      .updateOwn('shoppingList')
+      .deleteOwn('shoppingList');
 
     ac.grant('supervisor')
       .extend('basic')
       .readAny('profile')
       .readAny('ingredient')
       .readAny('recipe')
-      .readAny('mealplan');
+      .readAny('mealplan')
+      .readAny('fridgeIngredient')
+      .readAny('shoppingList');
 
     ac.grant('admin')
       .extend('basic')
@@ -38,7 +48,11 @@ module.exports = {
       .updateAny('recipe')
       .deleteAny('recipe')
       .updateAny('mealplan')
-      .deleteAny('mealplan');
+      .deleteAny('mealplan')
+      .updateAny('fridgeIngredient')
+      .deleteAny('fridgeIngredient')
+      .updateAny('shoppingList')
+      .deleteAny('shoppingList');
 
     return ac;
   })(),

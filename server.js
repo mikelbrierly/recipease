@@ -9,6 +9,8 @@ const express = require('express');
 const config = require('config');
 const { getSecret } = require('./secrets');
 const ingredientRoutes = require('./api/routes/ingredientRoutes');
+const fridgeIngredientRoutes = require('./api/routes/fridgeIngredientRoutes');
+const shoppingListRoutes = require('./api/routes/shoppingListRoutes');
 const userRoutes = require('./api/routes/userRoutes');
 const verifyToken = require('./api/auth/middleware/verifyToken');
 const recipeRoutes = require('./api/routes/recipeRoutes');
@@ -61,6 +63,8 @@ app.use(verifyToken);
 // });
 
 app.use('/ingredients', ingredientRoutes);
+app.use('/fridgeIngredients', fridgeIngredientRoutes);
+app.use('/shoppingLists', shoppingListRoutes);
 app.use('/users', userRoutes);
 app.use('/recipes', recipeRoutes);
 app.use('/mealplans', mealplanRoutes);

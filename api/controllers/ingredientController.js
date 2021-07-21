@@ -55,6 +55,13 @@ module.exports = {
       if (err) return next(new Error(err));
       // this filters out ingredients owned by other users
       const allowedIngredients = ingredients.filter((ingredient) => isAccessingOwn(req.user.id, ingredient.createdBy));
+      // ==== shit ====
+      // turns this into a crappy middleware so that it can be used by another controller (?aggregate=true query param)
+      if (req.query.aggregate && typeof res === 'function') {
+        const cb = res;
+        return cb(allowedIngredients);
+      }
+      // ==== end of shit ====
       return res.json(allowedIngredients);
     });
   },
